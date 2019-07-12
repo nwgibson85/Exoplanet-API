@@ -13,24 +13,20 @@ function formatQueryParams(params) {
  
 
 
-// function displayResults(responseJson) {
-//     console.log(responseJson);
-//     $('#results-list').empty();
-//     $("ul").append(
-//         "<li>" +
-        
-//       );
-//     for (let i = 0; i < responseJson.file.textfile; i++){
-//       $('#results-list').append(
-//         `<li><h3>${responseJson.data[i].cityName}</h3>
-//             <p>${responseJson.data[i].description}</p>
-//             <a href='${responseJson.data[i].url}'>${responseJson.data[i].url}</a>
-//             <ul id=''><h3></h3>    
-//             </ul>
-//         </li>`
-//         )};
-//     $('#results').removeClass('hidden');
-// };
+function printRandomExoPlanets(responseJson) {
+    
+    // $('#results-list').empty();
+    // for (let i = 0; i < displayedExoPs.length; i++){
+    //   $('#results-list').append(
+    //     `<li><h3>${responseJson[displayedExoPs[i]].}</h3>
+    //         <p>${responseJson.data[i].description}</p>
+    //         <a href='${responseJson.data[i].url}'>${responseJson.data[i].url}</a>
+    //         <ul id=''><h3></h3>    
+    //         </ul>
+    //     </li>`
+    //     )};
+    // $('#results').removeClass('hidden');
+}
 
 function fetchRandomExoPlanet() {
     let selected = ['alt_name', 'K2_kepmag', 'tm_designation', 'last_update']
@@ -52,16 +48,18 @@ function fetchRandomExoPlanet() {
         }
         throw new Error(response.statusText);
       })
-     .then(responseJson => console.log(responseJson), generateRandomPlanets(responseJson))
+     .then(responseJson => generateRandomPlanetsArr(responseJson))
       .catch(err => {
         $('#js-error-message').text(`Something went wrong: ${err.message}`);
       });
       
 }
 
-function generateRandomPlanets() {
+function generateRandomPlanetsArr(responseJson) {
+    console.log(responseJson);
     let desiredNum = $('#js-numberOfPlanets').val();
-    let randomPlanets = [];
+    let randomPlanets;
+    let displayedExoPs = [];
     for (let i = 0; i < desiredNum; i++) { 
         do {  
             randomPlanets = Math.floor(Math.random() * responseJson.length); 
@@ -77,15 +75,14 @@ function generateRandomPlanets() {
         }    
         return false; 
     } 
-    console.log(randomPlanets); 
+    console.log(displayedExoPs); 
+    printRandomExoPlanets(displayedExoPs, responseJson);
 }
 
 function watchForm() {
     $('form').submit(event => {
       event.preventDefault();
-      let desiredNum = $('#js-numberOfPlanets').val();
       fetchRandomExoPlanet();
-      
     });
 }
 
