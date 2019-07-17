@@ -26,32 +26,35 @@ function printRandomExoPlanets(displayedExoPs, Json) {
     resetX();
     console.log(Json[displayedExoPs[0]]);
     for (let i = 0; i < displayedExoPs.length; i++){
-      $('#results-list').append(
-        `<li><h3>${Json[displayedExoPs[i]].pl_name}</h3>
+      
+        $('#results-list').append(
+            `<h3>${Json[displayedExoPs[i]].pl_name}</h3>
             <label for="moreExoPlanetInfo">Choose what information you would like to display.</label> 
             <ul id="${x}jsExoPlanetInfo" name='userChoiceInfo'>
                 <li class="li-hostStar">
                     <h3>${Json[displayedExoPs[i]].pl_name}'s host star info</h3>
-                    <button id='${x}SeeStarInfo' type='click'>Go!</button>
+                    <button class="starInfo" id='${x}SeeStarInfo' type='click'>Go!</button>
                     <div id='${x}HostStar'>The host star ${Json[displayedExoPs[i]].pl_hostname} is ${Json[displayedExoPs[i]].st_dist} light years away from our Sun.</div>
                 </li>
                 <li class='li-orbit'>
                     <h3>${Json[displayedExoPs[i]].pl_name}'s orbital period</h3>
-                    <button id='${x}SeeOrbit' type='click'>Go!</button>
+                    <button class='orbit' id='${x}SeeOrbit' type='click'>Go!</button>
                     <div id='${x}Orbit'>It takes ${Json[displayedExoPs[i]].pl_name} ${Json[displayedExoPs[i]].pl_orbper} days to orbit ${Json[displayedExoPs[i]].pl_hostname}</div>
                 </li>
                 <li class='li-sizeCompare'>
                     <h3>See how big this ${Json[displayedExoPs[i]].pl_name} is compared to earth</h3>
-                    <button id='${x}' type="click">Go!</button>
-                    <div id='${x}SizeCompareBox'>${Json[displayedExoPs[i]].pl_name}'s radius is ${Json[displayedExoPs[i]].pl_rade} times Earth's radius</div>
+                    <button class='compare' id='${x}' type="click">Go!</button>
+                    <div id='${x}SizeCompareBox'></div>
                 </li>
             </ul>
             <a href='${Json[displayedExoPs[i]].pl_pelink}'>link to this planets page in the Exoplanet Encyclopedia</a>
-        </li>`
+        `
         )
         increaseX();
     };
     hideYoDivs(displayedExoPs);
+    listenToStarInfo(Json, displayedExoPs);
+    listenToOrbit(Json, displayedExoPs);
     listenToCompare(Json, displayedExoPs);   
 }
 
@@ -164,52 +167,26 @@ function generateRandomPlanetsArr(responseJson) {
     printRandomExoPlanets(displayedExoPs, Json);
 }
 
-function listenToCompare(Json, displayedExoPs) {
-    console.log('listeningToCompare')
-    $('#results-list').on('click', '#0', function(event) {
-    event.preventDefault();
-    let n = this.id;
-    console.log(this.id);
-    printCompareRade(Json, n, displayedExoPs);
-    });
+function listenToStarInfo() {
+    $(document).on("click", ".starInfo", function(event) {
+        event.preventDefault();
+        $(this).prop('id').show();
+    })
+}
+
+function listenToOrbit() {
+    $(document).on('click', '.orbit', function(event) {
+        event.preventDefault();
+        $(this).prop('id').show();
+    })
 }
 
 function listenToCompare(Json, displayedExoPs) {
-    console.log('listeningToCompare')
-    $('#results-list').on('click', '#1', function(event) {
+    console.log('listening')
+    $('#results-list').on('click', '.compare', function(event) {
     event.preventDefault();
     let n = this.id;
-    console.log(this.id);
-    printCompareRade(Json, n, displayedExoPs);
-    });
-}
-
-function listenToCompare(Json, displayedExoPs) {
-    console.log('listeningToCompare')
-    $('#results-list').on('click', '#2', function(event) {
-    event.preventDefault();
-    let n = this.id;
-    console.log(this.id);
-    printCompareRade(Json, n, displayedExoPs);
-    });
-}
-
-function listenToCompare(Json, displayedExoPs) {
-    console.log('listeningToCompare')
-    $('#results-list').on('click', '#3', function(event) {
-    event.preventDefault();
-    let n = this.id;
-    console.log(this.id);
-    printCompareRade(Json, n, displayedExoPs);
-    });
-}
-
-function listenToCompare(Json, displayedExoPs) {
-    console.log('listeningToCompare')
-    $('#results-list').on('click', '#4', function(event) {
-    event.preventDefault();
-    let n = this.id;
-    console.log(this.id);
+    console.log(n);
     printCompareRade(Json, n, displayedExoPs);
     });
 }
