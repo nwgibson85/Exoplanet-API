@@ -14,8 +14,15 @@
         <p>Using NASA's data on ExoPlanets (planets beyond our solar system) we can look up specific information on planets resembling our own Earth.</p>
 
         <form id="js-form">
-            <label for="numberOfExoPlanets">Choose a number 1-20 of random ExoPlanets to display.</label>
-            <input type="text" name='' id="js-numberOfPlanets" required placeholder="20">
+            <label for="numberOfExoPlanets">Choose a number 1-5 of random ExoPlanets to display.</label>
+            <select id="js-numberOfPlanets" name='exoPlanets'>
+                <option value='1'>1</option>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='4'>4</option>
+                <option value='5'>5</option>
+            </select>
+            <!-- <input type="text" name='' id="js-numberOfPlanets" required placeholder="20"> -->
 
             <label for="Random">Display random ExoPlanets</label>
             <input type="submit" name="randomExoPlanet" id="button-randomExo" required value='Random Earth Like Planets'>
@@ -26,6 +33,7 @@
         <p id="js-error-message" class="error-message"></p>
         <section id="results" class="hidden">
           <h2>Random ExoPlanets</h2>
+          <p>Please be patient while I "hack" Nasa for this info!</p>
           <ul id="results-list">
           </ul>
           <div id='compareSizeBox'>
