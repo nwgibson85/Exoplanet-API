@@ -34,12 +34,12 @@ function printRandomExoPlanets(displayedExoPs, Json) {
                 <li class="li-hostStar">
                     <h3>${Json[displayedExoPs[i]].pl_name}'s host star info</h3>
                     <button class="starInfo" id='${x}SeeStarInfo' type='click'>Go!</button>
-                    <div id='${x}HostStar'>The host star ${Json[displayedExoPs[i]].pl_hostname} is ${Json[displayedExoPs[i]].st_dist} light years away from our Sun.</div>
+                    <div class='${x}SeeStarInfo' id='${x}HostStar'>The host star ${Json[displayedExoPs[i]].pl_hostname} is ${Json[displayedExoPs[i]].st_dist} light years away from our Sun.</div>
                 </li>
                 <li class='li-orbit'>
                     <h3>${Json[displayedExoPs[i]].pl_name}'s orbital period</h3>
                     <button class='orbit' id='${x}SeeOrbit' type='click'>Go!</button>
-                    <div id='${x}Orbit'>It takes ${Json[displayedExoPs[i]].pl_name} ${Json[displayedExoPs[i]].pl_orbper} days to orbit ${Json[displayedExoPs[i]].pl_hostname}</div>
+                    <div class='${x}SeeOrbit' id='${x}Orbit'>It takes ${Json[displayedExoPs[i]].pl_name} ${Json[displayedExoPs[i]].pl_orbper} days to orbit ${Json[displayedExoPs[i]].pl_hostname}</div>
                 </li>
                 <li class='li-sizeCompare'>
                     <h3>See how big this ${Json[displayedExoPs[i]].pl_name} is compared to earth</h3>
@@ -47,8 +47,7 @@ function printRandomExoPlanets(displayedExoPs, Json) {
                     <div id='${x}SizeCompareBox'></div>
                 </li>
             </ul>
-            <a href='${Json[displayedExoPs[i]].pl_pelink}'>link to this planets page in the Exoplanet Encyclopedia</a>
-        `
+            <a href='${Json[displayedExoPs[i]].pl_pelink}'>link to this planet's page in the Exoplanet Encyclopedia</a><span>  At the bottom of the page is a list of publications related to this Exoplanet</span>`
         )
         increaseX();
     };
@@ -102,7 +101,8 @@ function printCompareRade(Json, n, displayedExoPs) {
                     </div>
                 </div>
             </div>
-        </div>`),
+        </div>`
+    ),
     earthRadiusComparer(Json, n, displayedExoPs)
     }
     $(desiredDiv).show();
@@ -170,14 +170,20 @@ function generateRandomPlanetsArr(responseJson) {
 function listenToStarInfo() {
     $(document).on("click", ".starInfo", function(event) {
         event.preventDefault();
-        $(this).prop('id').show();
+        let gamma = $(this).prop('id');
+        let delta = "." + gamma;
+        console.log(delta);
+        $(delta).show();
     })
 }
 
 function listenToOrbit() {
     $(document).on('click', '.orbit', function(event) {
         event.preventDefault();
-        $(this).prop('id').show();
+        let alpha = $(this).prop('id');
+        let beta = "." + alpha;
+        console.log(beta);
+        $(beta).show(); 
     })
 }
 
