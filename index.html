@@ -6,35 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Earth Like Planet Fun</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Space+Mono&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Search the Galaxy for Earth Like Planets!</h1>
-        <p>Using NASA's data on ExoPlanets (planets beyond our solar system) we can look up specific information on planets resembling our own Earth.</p>
+            <h1>Search the Galaxy Planets outside of our solar system!</h1>
+            <h3>Using NASA's data on ExoPlanets (planets beyond our solar system) we can look up specific information on alien planets and how they compare to our home world.</h3>
 
-        <form id="js-form">
-            <label for="numberOfExoPlanets">Choose a number 1-5 of random ExoPlanets to display.</label>
-            <select id="js-numberOfPlanets" name='exoPlanets'>
-                <option value='1'>1</option>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='4'>4</option>
-                <option value='5'>5</option>
-            </select>
-            <!-- <input type="text" name='' id="js-numberOfPlanets" required placeholder="20"> -->
-
-            <label for="Random">Display random ExoPlanets</label>
-            <input type="submit" name="randomExoPlanet" id="button-randomExo" required value='Random Earth Like Planets'>
+        <form class="purple" id="js-form">
+            <label for="Random"><h3>Click the button to display a random ExoPlanet</h3></label>
+            <button type="submit" name="randomExoPlanet" id="button-randomExo">display exoPlanet</button>
 
             
         </form>
 
-        <p id="js-error-message" class="error-message"></p>
+        <h3 id="js-error-message" class="error-message"></h3>
         <section id="results" class="hidden">
-          <h2>Random ExoPlanets</h2>
-          <p>Please be patient while I "hack" Nasa for this info!</p>
-          <ul id="results-list">
+          <h2>Randomly selected ExoPlanet</h2>
+          <h3>Please be patient while I "hack" Nasa for this info!</h3>
+          <ul id="results-list" class="list">
           </ul>
         </section>
     </div>

@@ -1,169 +1,246 @@
 'use strict';
 
+//Get request variables
 const apiKey = 'Bsa2YtF9x3coxqZqsYgqI4iAzpAsMgfhoRdKh0w4'; 
 const baseURL = 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI';
-let x = 0;
 let time = '';
 
+//turn the obj params into appropriate get request format
 function formatQueryParams(params) {
     const queryItems = Object.keys(params)
       .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     return queryItems.join('&');
 }
 
-function increaseX() {
-    x++;
-    console.log(x);
-}
-
-function resetX() {
-    x = 0;
-    console.log(x);
-}
-
-function printRandomExoPlanets(displayedExoPs, Json) {
+//display the sorted JSON information in the DOM
+function printRandomExoPlanets(rPA, num) {
     $('#results-list').empty();
-    resetX();
-    for (let i = 0; i < displayedExoPs.length; i++){
         $('#results-list').append(
-            `<h3>${Json[displayedExoPs[i]].pl_name}</h3>
-            <label for="moreExoPlanetInfo">Choose what information you would like to display.</label> 
-            <ul id="${x}jsExoPlanetInfo" name='userChoiceInfo'>
+            `<h2 class='starName'>${rPA[num].pl_name}</h2> 
+            <ul id="jsExoPlanetInfo" class="list-pl" name='userChoiceInfo'>
                 <li class="li-hostStar">
-                    <h3>${Json[displayedExoPs[i]].pl_name}'s host star info</h3>
-                    <button class="starInfo" id='${x}SeeStarInfo' type='click'>Go!</button>
-                    <div class='${x}SeeStarInfo' id='${x}HostStar'></div>
+                    <h3>${rPA[num].pl_name}'s host star info</h3>
+                    <button class="hostStar" id='seeStarInfo' type='click'>Go!</button>
+                    <button class='hide' id='hostStar-hide' type='click'>Hide Info</button>
+                    <div class='seeStarInfo' id='hostStar'></div>
                 </li>
                 <li class='li-orbit'>
-                    <h3>${Json[displayedExoPs[i]].pl_name}'s orbital period</h3>
-                    <button class='orbit' id='${x}SeeOrbit' type='click'>Go!</button>
-                    <div class='${x}SeeOrbit' id='${x}Orbit'></div>
+                    <h3>${rPA[num].pl_name}'s orbital period</h3>
+                    <button class='orbit' id='seeOrbit' type='click'>Go!</button>
+                    <button class='hide' id='orbit-hide' type='click'>Hide Info</button>
+                    <div id='orbit'></div>
                 </li>
                 <li class='li-sizeCompare'>
-                    <h3>See how big this ${Json[displayedExoPs[i]].pl_name} is compared to earth</h3>
-                    <button class='compare' id='${x}' type="click">Go!</button>
-                    <div id='${x}SizeCompareBox'></div>
+                    <h3>See how big this ${rPA[num].pl_name} is compared to earth</h3>
+                    <button class='exoCompare' type="click">Go!</button>
+                    <button class='hide' id='exoCompare-hide' type='click'>Hide Info</button>
+                    <div id='exoCompare'></div>
                 </li>
-            </ul>
-            <a href='${Json[displayedExoPs[i]].pl_pelink}'>link to this planet's page in the Exoplanet Encyclopedia</a><span>  Scroll to the bottom of the page to see a list of publications related to this Exoplanet</span>`
+                <li class='li-exoWeight'>
+                    <h3>Enter your weight to see how much you would weight on ${rPA[num].pl_name}</h3>
+                    <form action='/action_page.php'>
+                    <h4>type your weight here. (or use my weight as the default)<input type='text' id='userWeight' name='weight' required value='220'><br>
+                    <select id="imperialOrMetric" name='kgOrlbs' value='lbs'><h4>Select lbs or kg</h4>
+                    <option value='lbs'>lbs</option>
+                    <option value='kg'>kg</option></select>
+                    <button class='exoWeight' type='click'>Go!</button>
+                    <button class='hide' id='exoWeight-hide' type='click'>Hide Info</button>
+                    <div id='exoWeight'></div>
+                </li>
+                <li id='link' class='li-link'>
+                    <h3>This web link will direct you to a page made by NASA with further information about ${rPA[num].pl_name}</h3>
+                    <button class='link' id='linkButton' type='click'>Go!</button>
+                </li>
+            </ul>`
+            
         )
-        increaseX();
-    };
-    hideYoDivs(displayedExoPs);
-    listenToStarInfo(Json, displayedExoPs);
-    listenToOrbit(Json, displayedExoPs);
-    listenToCompare(Json, displayedExoPs);   
+    $('#hostStar').hide();
+    $('#orbit').hide();
+    $('#exoCompare').hide();
+    $('.hide').hide();
+    listenToStarInfo(rPA, num);
+    listenToOrbit(rPA, num);
+    listenToCompare(rPA, num);
+    listenForcalcExoWeight(rPA, num);
+    listenForLinkClick(rPA, num);
+    listenToHide();
 }
-
-function hideYoDivs(displayedExoPs) {
-    for (let i = 0; i < displayedExoPs.length; i++) { 
-        let eta = 0;
-        console.log(eta);
-        let hostStar = "#" + eta + "HostStar";
-        let orbit = "#" + eta + "Orbit";
-        let size = "#" + eta + "SizeCompareBox";
-        $(hostStar).hide();
-        $(orbit).hide();
-        $(size).hide();
-        eta++;  
-    }
-    console.log("divs hidden");
-}
-
-function printStarInfo(Json, displayedExoPs, delta) {
-    let epsilon = delta.charAt(1);
-    let divDesired = "#" + epsilon + "HostStar";
-    console.log(Json[displayedExoPs[epsilon]].st_dist);
-    $(divDesired).empty();
-    if (Json[displayedExoPs[epsilon]].st_dist === null) {
-        $(divDesired).append(
-            `The host star ${Json[displayedExoPs[epsilon]].pl_hostname}'s distance from our solar system has not been confirmed yet.`
+      
+function printStarInfo(rPA, num) {
+    let distance = rPA[num].st_dist;
+    let snailspeed = 21600 * distance + ' years';
+    console.log(distance);
+    $('#hostStar').empty();
+    if (distance === null) {
+        $('#hostStar').append(
+            `<h3>The host star ${rPA[num].pl_hostname}'s distance from our solar system has not been confirmed yet.</h3>`
         )
     }
     else {
-        $(divDesired).append(
-            `The host star ${Json[displayedExoPs[epsilon]].pl_hostname} is ${Json[displayedExoPs[epsilon]].st_dist} light years away from our Sun.`
+        $('#hostStar').append(
+            `<h3>The host star ${rPA[num].pl_hostname} is ${distance} light years away from our Sun. Using current space tech it would take us ${snailspeed} to reach this system.</h3>`
         )
     }
-    $(divDesired).show();
+    $('#hostStar').show();
 }
 
-function printOrbit(Json, displayedExoPs, beta) {  
-    let zeta = beta.charAt(1);
-    let div = "#" + zeta + "Orbit";
-    console.log(Json[displayedExoPs[zeta]].pl_orbper);
-    $(div).empty();
-    if (Json[displayedExoPs[zeta]].pl_orbper === null) {
-        $(div).append(
-            `NASA currently does not have information on how long it takes for ${Json[displayedExoPs[zeta]].pl_name} to orbit its star.`
+function printOrbit(rPA, num) {  
+    let orb = rPA[num].pl_orbper
+    let timeArr = [];
+    timeArr.push(Math.floor(orb/365));
+    let remainder = orb % 365;
+    timeArr.push(Math.floor(remainder/30));
+    timeArr.push(Math.floor(remainder % 30));
+    console.log(timeArr);
+    let timeYears = timeArr[0] + " years, ";
+    let timeMonths = timeArr[1] + " months, and ";
+    let timeDays = timeArr[2] + " days";
+    let time;
+    console.log(rPA[num].pl_orbper);
+    $('#orbit').empty();
+    switch (true) {
+      case (timeArr[0] > 0 && timeArr[1] > 0 && timeArr[2] > 0):
+        time = timeYears + timeMonths + timeDays;
+        break;
+      case (timeArr[0] > 0 && timeArr[1] === 0 && timeArr[2] > 0):
+        time = timeYears + " and " + timeDays;
+        break;
+      case (timeArr[0] === 0 && timeArr[1] > 0 && timeArr[2] > 0):
+        time = timeMonths + timeDays;
+        break;
+      case (timeArr[0] ===0 && timeArr[1] ===0 && timeArr[2] > 0):
+        time = timeDays;
+        break;
+      default:
+        time = null;
+      }  
+      console.log(time);
+      if (time !== null) {
+        $('#orbit').append(
+            `<h3>It takes ${rPA[num].pl_name} ${time} to orbit its host Star.</h3>`
+      )} 
+      else {
+      $('#orbit').append(
+        `<h3>NASA currently does not have information on how long it takes for ${rPA[num].pl_name} to orbit its star. </h3>`
         )
-    }
-    else {
-        let num = Json[displayedExoPs[zeta]].pl_orbper
-        let timeArr = [];
-        timeArr.push(Math.floor(num/365));
-        let remainder = num % 365;
-        timeArr.push(Math.floor(remainder/30));
-        timeArr.push(Math.floor(remainder % 30));
-        console.log(timeArr);
-        let time = timeArr[0] + " years, " + timeArr[1] + ' months, and ' + timeArr[2] + ' days' 
-        console.log(time);
-        
-        $(div).append(
-            `It takes ${Json[displayedExoPs[zeta]].pl_name} ${time} to orbit its host Star.`
-        )
-    }
-    $(div).show();
+    }    
+    $('#orbit').show();
 }
 
-
-
-function printCompareRade(Json, n, displayedExoPs) {
-    let desiredDiv = "#" + n + "SizeCompareBox";
-    $(desiredDiv).empty();
-    console.log(Json[displayedExoPs[n]].pl_rade);
-    if (Json[displayedExoPs[n]].pl_rade === null) {
-        $(desiredDiv).append(
+function printCompareRade(rPA, num) {
+    $('#exoCompare').empty();
+    console.log(rPA[num].pl_rade);
+    if (rPA[num].pl_rade === null) {
+        $('#exoCompare').append(
             `<p>Sorry NASA's data packet does not have a confirmed radius size for this Exoplanet.</p>`
     )}
     else {  
-    $(desiredDiv).append(
-        `<div id="circle_box">
+    $('#exoCompare').append(
+        `<div id="circle_box"><h3>${rPA[num].pl_name}'s radius = ${rPA[num].pl_rade} times earth's radius</h3>
             <div id="earth">
                 <div id="circleEarth">
                     <div id="circleTextEarth">
                         <div id="textE">
-                            <p>Earth</p>
+                            <h4>Earth</h4>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id='${n}exoPlanet'>
+            <div id='exoPlanet'>
                 <div id="circleExoP">
                     <div id="circleTextExoPlanet">
                         <div id="textExoP">
-                            <p>${Json[displayedExoPs[n]].pl_name}'s radius = ${Json[displayedExoPs[n]].pl_rade} times earth's radius</p>
+                            <h4>${rPA[num].pl_name}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>`
     ),
-    earthRadiusComparer(Json, n, displayedExoPs)
+    earthRadiusComparer(rPA, num)
     }
-    $(desiredDiv).show();
+    $('#exoCompare').show();
 }
 
-function earthRadiusComparer(Json, n, displayedExoPs) {
-    let adjWidth = (Json[displayedExoPs[n]].pl_rade * 200) + 'px';
-    let adjHeight = (Json[displayedExoPs[n]].pl_rade * 200) + 'px';
-    let circleId = n + "exoPlanet";
-    document.getElementById(circleId).style.height=adjHeight;
-    document.getElementById(circleId).style.width=adjWidth;
+function earthRadiusComparer(rPA, num) {
+    let cssWidth = $("#earth").css('width');
+    let multiplier = cssWidth.slice(0, -2);
+    let kappa;
+    console.log(multiplier);
+    if (multiplier > 50) {
+        kappa = 100
+    }
+    else {
+        kappa = 50
+    }
+    console.log(kappa);
+    let adjWidth = (rPA[num].pl_rade * kappa) + 'px';
+    let adjHeight = (rPA[num].pl_rade * kappa) + 'px';
+    document.getElementById('exoPlanet').style.height=adjHeight;
+    document.getElementById('exoPlanet').style.width=adjWidth;
 }
 
+function calcExoWeight(rPA, num) {
+    $('#exoWeight').empty();
+    let weight;
+    let weightType = $('#imperialOrMetric').val();
+    if (weightType === 'lbs') {
+       weight = $('#userWeight').val()/2.2;
+    }
+    else {
+        weight = $('#userWeight').val();
+    }
+    let masse = rPA[num].pl_masse;
+    let rade = rPA[num].pl_rade;
+    let g = 6.673 * Math.pow(10, -11);
+    let m = 5.972 * Math.pow(10, 24);
+    let r = 6371000;
+    let M = masse * m;
+    let R = Math.pow((rade * r), 2);
+    let exoGA = (g * M)/R;
+    console.log(exoGA);
+    let fG =  g * M /R;
+    console.log(fG);
+    let earthFg = g * m /Math.pow(r, 2);
+    console.log(earthFg);
+    let exoW  = (fG/earthFg) * weight;
+    console.log(exoW);
+    if (fG < earthFg) {
+        if (weightType === 'lbs') {
+            exoW = exoW * 2.2;
+            $('#exoWeight').append(
+                `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
+            )
+        }
+        else {
+            exoW = exoW;
+            $('#exoWeight').append(
+                `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
+            )
+        }
+        
+    }
+    else {
+        if (weightType === 'lbs') {
+            exoW = exoW * 2.2;
+            $('#exoWeight').append(
+                `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
+            )
+        }
+        else {
+            exoW = exoW;
+            $('#exoWeight').append(
+                `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
+            )
+        }
+        
+    }
+    $('#exoWeight').show();
+}
+
+//NASA API Get request
 function fetchRandomExoPlanet() {
-    let selected = ['pl_hostname', 'pl_name', 'pl_pnum', 'pl_bmassj', 'pl_k2flag', 'st_dist', 'st_mass', 'pl_masse', 'pl_rade', 'pl_disc', 'pl_pelink', 'pl_edelink', 'pl_eqt', 'pl_insol', 'pl_cbflag', 'pl_orbper'];
+    let selected = ['pl_hostname', 'pl_name', 'pl_pnum', 'st_dist', 'st_mass', 'pl_masse', 'pl_rade', 'pl_disc', 'pl_pelink', 'pl_edelink', 'pl_orbper', 'pl_eqt'];
     const params = {
       table: 'exoplanets',
       select: selected,
@@ -181,72 +258,134 @@ function fetchRandomExoPlanet() {
         }
         throw new Error(response.statusText);
       })
-     .then(responseJson => generateRandomPlanetsArr(responseJson))
-      .catch(err => {
-        $('#js-error-message').text(`Something went wrong: ${err.message}`);
-      });
       
+     .then(responseJson => sortJson(responseJson))
+      .catch(err => {
+        $('#js-error-message').text(`Something went wrong: ${err.message}`);  //&& Json[i].pl_masse !== null
+      });   
 }
 
-function generateRandomPlanetsArr(responseJson) {
-    let desiredNum = $('#js-numberOfPlanets').val();
-    let randomPlanets;
-    let displayedExoPs = [];
-    for (let i = 0; i < desiredNum; i++) { 
-        do {  
-            randomPlanets = Math.floor(Math.random() * responseJson.length); 
-        } 
-        while (randomExoPs());  
-        displayedExoPs.push(randomPlanets); 
-    } 
-    function randomExoPs() { 
-        for (let i = 0; i < displayedExoPs.length; i++) { 
-            if (displayedExoPs[i] === randomPlanets) { 
-                return true; 
-            } 
-        }    
-        return false; 
-    } 
-    console.log(displayedExoPs); 
-    let Json = $.extend(true, {}, responseJson);
-    console.log(Json);
-    printRandomExoPlanets(displayedExoPs, Json);
+// narrow down responseJSon to most useful planets 4k down to ~ 110
+function sortJson(responseJson) { 
+    let uselessJson = [];
+    let arr = [];
+    let arr1 = [];
+    let arr2 = [];
+    let randomPlanetsArr = [];
+    for (let i = 0; i < responseJson.length; i++) {
+      if (responseJson[i].pl_pelink === null) {
+          uselessJson.push(responseJson[i]);
+      }
+      else {
+          arr.push(responseJson[i]);
+      }
+    }
+    for (let i = 0; i < arr.length; i ++) {
+      if (responseJson[i].pl_orbper === null) {
+            uselessJson.push(responseJson[i]);
+        }
+        else {
+            arr1.push(responseJson[i]);
+        }
+    }
+    for (let i = 0; i < arr1.length; i++) {
+      if (responseJson[i].pl_eqt === null) {
+        uselessJson.push(responseJson[i]);
+      }
+      else {
+        arr2.push(responseJson[i]);
+      }
+    }
+    for (let i = 0; i < arr2.length; i++) {
+      if (responseJson[i].pl_masse === null) {
+        uselessJson.push(responseJson[i]);
+      }
+      else {
+        randomPlanetsArr.push(responseJson[i]);
+      }
+    }
+    console.log(arr.length);
+    console.log(arr1.length);
+    console.log(arr2.length);
+    console.log(randomPlanetsArr.length);
+    console.log(uselessJson.length);
+    generateRandomPlanet(randomPlanetsArr);
 }
 
-function listenToStarInfo(Json, displayedExoPs) {
-    $(document).on("click", ".starInfo", function(event) {
-        event.preventDefault();
-        let gamma = $(this).prop('id');
-        let delta = "." + gamma;
-        console.log(delta);
-        printStarInfo(Json, displayedExoPs, delta);   
-    })
+//pick a random planet to display info  
+function generateRandomPlanet(randomPlanetsArr) {
+    let rPA = randomPlanetsArr  
+    let num = Math.floor(Math.random() * rPA.length); 
+    console.log(rPA[num]);  
+    printRandomExoPlanets(rPA, num);
 }
 
-function listenToOrbit(Json, displayedExoPs) {
-    $(document).on('click', '.orbit', function(event) {
+//event listeners
+function listenToHide() {
+    $(document).on('click', '.hide', function(event) {
         event.preventDefault();
         let alpha = $(this).prop('id');
-        let beta = "." + alpha;
-        console.log(beta);
-        printOrbit(Json, displayedExoPs, beta) 
+        let beta = alpha.slice(0, -5);
+        let gamma = '#' + beta;
+        $(gamma).hide();
+        $(this).hide();
     })
 }
 
-function listenToCompare(Json, displayedExoPs) {
+function listenForLinkClick(rPA, num) {
+    $(document).on("click", ".link", function(event){
+        event.preventDefault();
+        let link = (rPA[num].pl_pelink);
+        console.log('Handled link Click'); 
+        window.open(
+            link, '_blank');   
+    });
+}
+
+function listenToStarInfo(rPA, num) {
+    $(document).on("click", ".hostStar", function(event) {
+        event.preventDefault();
+        let alpha = $(this).prop('class');
+        let beta = '#' +  alpha + '-hide';
+        $(beta).show();
+        printStarInfo(rPA, num);   
+    })
+}
+
+function listenToOrbit(rPA, num) {
+    $(document).on('click', '.orbit', function(event) {
+        event.preventDefault();
+        let alpha = $(this).prop('class');
+        let beta = '#' +  alpha + '-hide';
+        $(beta).show();
+        printOrbit(rPA, num) 
+    })
+}
+
+function listenToCompare(rPA, num) {
     console.log('listening')
-    $('#results-list').on('click', '.compare', function(event) {
-    event.preventDefault();
-    let n = this.id;
-    console.log(n);
-    printCompareRade(Json, n, displayedExoPs);
+    $('#results-list').on('click', '.exoCompare', function(event) {
+        event.preventDefault();
+        let alpha = $(this).prop('class');
+        let beta = '#' + alpha + '-hide';
+        $(beta).show();
+        printCompareRade(rPA, num);
+    });
+}
+
+function listenForcalcExoWeight(rPA, num) {
+    $(document).on('click', '.exoWeight', function(event) {
+        event.preventDefault();
+        let alpha = $(this).prop('class');
+        let beta = '#' + alpha + '-hide';
+        $(beta).show();
+        calcExoWeight(rPA, num);  
     });
 }
 
 function watchForm() {
     $('form').submit(event => {
         event.preventDefault();
-        
         $('#results').show();
         fetchRandomExoPlanet();
     });
