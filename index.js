@@ -37,7 +37,7 @@ function printRandomExoPlanets(rPA, num) {
                     <div id='exoCompare'></div>
                 </li>
                 <li class='li-exoWeight'>
-                    <h3>Enter your weight to see how much you would weight on ${rPA[num].pl_name}</h3>
+                    <h3>Enter your weight to see how much you would weigh on ${rPA[num].pl_name}</h3>
                     <form action='/action_page.php'>
                     <h4>type your weight here. (or use my weight as the default)<input type='text' id='userWeight' name='weight' required value='220'><br>
                     <select id="imperialOrMetric" name='kgOrlbs' value='lbs'><h4>Select lbs or kg</h4>
@@ -197,13 +197,13 @@ function calcExoWeight(rPA, num) {
     let r = 6371000;
     let M = masse * m;
     let R = Math.pow((rade * r), 2);
-    let exoGA = (g * M)/R;
+    let exoGA = (g * M/R);
     console.log(exoGA);
     let fG =  g * M /R;
     console.log(fG);
     let earthFg = g * m /Math.pow(r, 2);
     console.log(earthFg);
-    let exoW  = (fG/earthFg) * weight;
+    let exoW  = fG/earthFg * weight;
     console.log(exoW);
     if (fG < earthFg) {
         if (weightType === 'lbs') {
