@@ -68,8 +68,8 @@ function printRandomExoPlanets(rPA, num) {
       
 function printStarInfo(rPA, num) {
     let distance = rPA[num].st_dist;
-    let snailspeed = 21600 * distance + ' years';
-    console.log(distance);
+    let shrinkNum = 21600 * distance * Math.pow(10, -6);
+    let snailSpeed = shrinkNum + ' million years';
     $('#hostStar').empty();
     if (distance === null) {
         $('#hostStar').append(
@@ -78,7 +78,7 @@ function printStarInfo(rPA, num) {
     }
     else {
         $('#hostStar').append(
-            `<h3>The host star ${rPA[num].pl_hostname} is ${distance} light years away from our Sun. Using current space tech it would take us ${snailspeed} to reach this system.</h3>`
+            `<h3>The host star ${rPA[num].pl_hostname} is ${distance} light years away from our Sun. Using current space tech it would take us ${snailSpeed} to reach this system.</h3>`
         )
     }
     $('#hostStar').show();
@@ -91,12 +91,10 @@ function printOrbit(rPA, num) {
     let remainder = orb % 365;
     timeArr.push(Math.floor(remainder/30));
     timeArr.push(Math.floor(remainder % 30));
-    console.log(timeArr);
     let timeYears = timeArr[0] + " years, ";
     let timeMonths = timeArr[1] + " months, and ";
     let timeDays = timeArr[2] + " days";
     let time;
-    console.log(rPA[num].pl_orbper);
     $('#orbit').empty();
     switch (true) {
       case (timeArr[0] > 0 && timeArr[1] > 0 && timeArr[2] > 0):
@@ -114,7 +112,6 @@ function printOrbit(rPA, num) {
       default:
         time = null;
       }  
-      console.log(time);
       if (time !== null) {
         $('#orbit').append(
             `<h3>It takes ${rPA[num].pl_name} ${time} to orbit its host Star.</h3>`
@@ -129,7 +126,6 @@ function printOrbit(rPA, num) {
 
 function printCompareRade(rPA, num) {
     $('#exoCompare').empty();
-    console.log(rPA[num].pl_rade);
     if (rPA[num].pl_rade === null) {
         $('#exoCompare').append(
             `<p>Sorry NASA's data packet does not have a confirmed radius size for this Exoplanet.</p>`
@@ -166,14 +162,12 @@ function earthRadiusComparer(rPA, num) {
     let cssWidth = $("#earth").css('width');
     let multiplier = cssWidth.slice(0, -2);
     let kappa;
-    console.log(multiplier);
     if (multiplier > 50) {
         kappa = 100
     }
     else {
         kappa = 50
     }
-    console.log(kappa);
     let adjWidth = (rPA[num].pl_rade * kappa) + 'px';
     let adjHeight = (rPA[num].pl_rade * kappa) + 'px';
     document.getElementById('exoPlanet').style.height=adjHeight;
@@ -197,23 +191,23 @@ function calcExoWeight(rPA, num) {
     let r = 6371000;
     let M = masse * m;
     let R = Math.pow((rade * r), 2);
-    let exoGA = (g * M/R);
-    console.log(exoGA);
+    let GA = (g * M/R);
+    let exoGA = GA.toFixed(2);
     let fG =  g * M /R;
-    console.log(fG);
     let earthFg = g * m /Math.pow(r, 2);
-    console.log(earthFg);
-    let exoW  = fG/earthFg * weight;
-    console.log(exoW);
+    let W  = fG/earthFg * weight;
+    let lbs = W * 2.2;
+    let exoWlbs = lbs.toFixed(2);
+    let exoW;
     if (fG < earthFg) {
         if (weightType === 'lbs') {
-            exoW = exoW * 2.2;
+            exoW = exoWlbs
             $('#exoWeight').append(
                 `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
             )
         }
         else {
-            exoW = exoW;
+            exoW = W;
             $('#exoWeight').append(
                 `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
             )
@@ -222,13 +216,13 @@ function calcExoWeight(rPA, num) {
     }
     else {
         if (weightType === 'lbs') {
-            exoW = exoW * 2.2;
+            exoW = exoWlbs
             $('#exoWeight').append(
                 `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
             )
         }
         else {
-            exoW = exoW;
+            exoW = W;
             $('#exoWeight').append(
                 `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
             )
@@ -249,7 +243,6 @@ function fetchRandomExoPlanet() {
     const queryString = formatQueryParams(params);
     const url = baseURL + "?" + queryString;
   
-    console.log(url);
     
     fetch(url)
       .then(response => {
@@ -304,19 +297,13 @@ function sortJson(responseJson) {
         randomPlanetsArr.push(responseJson[i]);
       }
     }
-    console.log(arr.length);
-    console.log(arr1.length);
-    console.log(arr2.length);
-    console.log(randomPlanetsArr.length);
-    console.log(uselessJson.length);
     generateRandomPlanet(randomPlanetsArr);
 }
 
 //pick a random planet to display info  
 function generateRandomPlanet(randomPlanetsArr) {
     let rPA = randomPlanetsArr  
-    let num = Math.floor(Math.random() * rPA.length); 
-    console.log(rPA[num]);  
+    let num = Math.floor(Math.random() * rPA.length);  
     printRandomExoPlanets(rPA, num);
 }
 
@@ -335,8 +322,7 @@ function listenToHide() {
 function listenForLinkClick(rPA, num) {
     $(document).on("click", ".link", function(event){
         event.preventDefault();
-        let link = (rPA[num].pl_pelink);
-        console.log('Handled link Click'); 
+        let link = (rPA[num].pl_pelink); 
         window.open(
             link, '_blank');   
     });
@@ -363,7 +349,6 @@ function listenToOrbit(rPA, num) {
 }
 
 function listenToCompare(rPA, num) {
-    console.log('listening')
     $('#results-list').on('click', '.exoCompare', function(event) {
         event.preventDefault();
         let alpha = $(this).prop('class');
