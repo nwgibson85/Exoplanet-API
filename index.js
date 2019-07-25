@@ -12,7 +12,7 @@ function formatQueryParams(params) {
     return queryItems.join('&');
 }
 
-//display the sorted JSON information in the DOM
+//DOM manipulation
 function printRandomExoPlanets(rPA, num) {
     $('#results-list').empty();
         $('#results-list').append(
@@ -261,7 +261,7 @@ function fetchRandomExoPlanet() {
       
      .then(responseJson => sortJson(responseJson))
       .catch(err => {
-        $('#js-error-message').text(`Something went wrong: ${err.message}`);  //&& Json[i].pl_masse !== null
+        $('#js-error-message').text(`Something went wrong: ${err.message}`);  
       });   
 }
 

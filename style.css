@@ -139,26 +139,26 @@ button:hover {
   margin-top: 5px;
 }
 
-/* styling for the size comparison divs
-Main Container -  this controls the size of the circle */
+/* styling for the size comparison divs*/
+
 #circle_box {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
+/* circle size controlled by these two */
 #earth {
-    width : 100px;
-    height : 100px;
-    margin : 20px;
-    padding : 0;
+  width : 100px;
+  height : 100px;
+  margin : 20px;
+  padding : 0;
 }
   
 #exoP {
-    margin : 20px;
-    padding : 0;
+  margin : 20px;
+  padding : 0;
 }
   
-  /* Circle Main draws the actual circle */
 #circle_box {
   display: flex;
   flex-direction: column;
@@ -166,45 +166,37 @@ Main Container -  this controls the size of the circle */
   align-items: center;
 }
 
+/* circle styling here */
 #circleEarth, #circleExoP {
-    width : 100%;
-    height : 100%;
-    border-radius : 50%;
-    border : 5px solid #432377;	/* can alter thickness and colour of circle on this line */
-    margin : 0;
-    padding : 0; 
+  width : 100%;
+  height : 100%;
+  border-radius : 50%;
+  border : 5px solid #432377;	
+  margin : 0;
+  padding : 0; 
 }
   
-  /* Circle Text Container - constrains text area to within the circle */
+
 #circleTextEarth, #circleTextExoPlanet {
-      /* area constraints */
-    width : 70%;
-    height : 70%;
-    max-width : 70%;
-    max-height : 70%;
-    margin : 0;
-    padding : 0;
-  
-      /* some position nudging to center the text area */
-    position : relative;
-    left : 15%;
-    top : 15%;
-      
-      /* preserve 3d prevents blurring sometimes caused by the text centering in the next class */
-    transform-style : preserve-3d;
+  width : 70%;
+  height : 70%;
+  max-width : 70%;
+  max-height : 70%;
+  margin : 0;
+  padding : 0;
+  position : relative;
+  left : 15%;
+  top : 15%;
+  transform-style : preserve-3d;
 }
   
-  /* Circle Text - the appearance of the text within the circle plus vertical centering */
 #textE, #textExoP {
-      /* change font/size/etc here */
-    font: 16px "Tahoma", Arial, Serif;	
-    text-align : center;
-    color: white;
-      
-      /* vertical centering technique */
-    position : relative;
-    top : 50%;
-    transform : translateY(-50%);
+  font: 16px "Tahoma", Arial, Serif;	
+  text-align : center;
+  color: white;    
+  position : relative;
+  top : 50%;
+  transform : translateY(-50%);
 }
 
 @media only screen and (max-width: 600px) {
