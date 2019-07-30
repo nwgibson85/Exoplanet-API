@@ -13,7 +13,6 @@ h1, h2 {
   font-family: 'Roboto', sans-serif;
 }
 
-
 h3, h4 {
   font-family: 'Space Mono', monospace; 
 }
@@ -139,8 +138,7 @@ button:hover {
   margin-top: 5px;
 }
 
-/* styling for the size comparison divs*/
-
+/* ---------styling for the size comparison divs----------- */
 #circle_box {
   display: flex;
   flex-direction: row;
@@ -176,7 +174,6 @@ button:hover {
   padding : 0; 
 }
   
-
 #circleTextEarth, #circleTextExoPlanet {
   width : 70%;
   height : 70%;

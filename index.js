@@ -87,21 +87,23 @@ function printStarInfo(rPA, num) {
 function printOrbit(rPA, num) {  
     let orb = rPA[num].pl_orbper
     let timeArr = [];
+    //managing the number of days given by pl_orbper into years, months, and days
     timeArr.push(Math.floor(orb/365));
     let remainder = orb % 365;
     timeArr.push(Math.floor(remainder/30));
     timeArr.push(Math.floor(remainder % 30));
-    let timeYears = timeArr[0] + " years, ";
-    let timeMonths = timeArr[1] + " months, and ";
-    let timeDays = timeArr[2] + " days";
+    let timeYears = timeArr[0] + ' years, ';
+    let timeMonths = timeArr[1] + ' months, and ';
+    let timeDays = timeArr[2] + ' days';
     let time;
     $('#orbit').empty();
+    //responsive display depending on the orbital period.  Will display 6 days instead of 0 years 0 months 6 days
     switch (true) {
       case (timeArr[0] > 0 && timeArr[1] > 0 && timeArr[2] > 0):
         time = timeYears + timeMonths + timeDays;
         break;
       case (timeArr[0] > 0 && timeArr[1] === 0 && timeArr[2] > 0):
-        time = timeYears + " and " + timeDays;
+        time = timeYears + ' and ' + timeDays;
         break;
       case (timeArr[0] === 0 && timeArr[1] > 0 && timeArr[2] > 0):
         time = timeMonths + timeDays;
@@ -159,9 +161,10 @@ function printCompareRade(rPA, num) {
 }
 
 function earthRadiusComparer(rPA, num) {
-    let cssWidth = $("#earth").css('width');
+    let cssWidth = $('#earth').css('width');
     let multiplier = cssWidth.slice(0, -2);
     let kappa;
+    //changes the size of the earth circle depending on user screen size.
     if (multiplier > 50) {
         kappa = 100
     }
@@ -199,35 +202,42 @@ function calcExoWeight(rPA, num) {
     let lbs = W * 2.2;
     let exoWlbs = lbs.toFixed(2);
     let exoW;
-    if (fG < earthFg) {
-        if (weightType === 'lbs') {
-            exoW = exoWlbs
-            $('#exoWeight').append(
-                `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
-            )
-        }
+    //sorts out negative values and non integer values
+    if (weight > 0) {
+        if (fG < earthFg) {
+            //changes the return value depending on lbs vs kg
+            if (weightType === 'lbs') {
+                exoW = exoWlbs
+                $('#exoWeight').append(
+                    `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
+                )
+            }
+            else {
+                exoW = W;
+                $('#exoWeight').append(
+                    `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
+                )
+            }
+            }
         else {
-            exoW = W;
-            $('#exoWeight').append(
-                `<h3>The gravitaional force on ${rPA[num].pl_name} is roughly ${exoGA} compared to earth's which is roughly 9.81. This means you would only weigh ${exoW} ${weightType} while standing on its surface.`
-            )
+            if (weightType === 'lbs') {
+                exoW = exoWlbs
+                $('#exoWeight').append(
+                    `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
+                )
+            }
+            else {
+                exoW = W;
+                $('#exoWeight').append(
+                    `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
+                )
+            }
         }
-        
     }
     else {
-        if (weightType === 'lbs') {
-            exoW = exoWlbs
-            $('#exoWeight').append(
-                `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
-            )
-        }
-        else {
-            exoW = W;
-            $('#exoWeight').append(
-                `<h3>The gravitaional force on ${rPA[num].pl_name} is ${exoGA} compared to earth's which is roughly 9.81. This means you would weigh ${exoW} ${weightType} while standing on its surface.`
-            )
-        }
-        
+        $('#exoWeight').append(
+            '<h3>Error! Please provide a numerical value in digit form that is greater than 0.</h3>'
+        )
     }
     $('#exoWeight').show();
 }
@@ -238,12 +248,11 @@ function fetchRandomExoPlanet() {
     const params = {
       table: 'exoplanets',
       select: selected,
-      format: "json",
+      format: 'json',
     };
     const queryString = formatQueryParams(params);
-    const url = baseURL + "?" + queryString;
+    const url = baseURL + '?' + queryString;
   
-    
     fetch(url)
       .then(response => {
         if (response.ok) {
@@ -251,7 +260,6 @@ function fetchRandomExoPlanet() {
         }
         throw new Error(response.statusText);
       })
-      
      .then(responseJson => sortJson(responseJson))
       .catch(err => {
         $('#js-error-message').text(`Something went wrong: ${err.message}`);  
@@ -282,7 +290,7 @@ function sortJson(responseJson) {
         }
     }
     for (let i = 0; i < arr1.length; i++) {
-      if (responseJson[i].pl_eqt === null) {
+      if (responseJson[i].pl_orbper === null) {
         uselessJson.push(responseJson[i]);
       }
       else {
@@ -307,7 +315,7 @@ function generateRandomPlanet(randomPlanetsArr) {
     printRandomExoPlanets(rPA, num);
 }
 
-//event listeners
+//---------------event listeners----------------------
 function listenToHide() {
     $(document).on('click', '.hide', function(event) {
         event.preventDefault();
@@ -320,7 +328,7 @@ function listenToHide() {
 }
 
 function listenForLinkClick(rPA, num) {
-    $(document).on("click", ".link", function(event){
+    $(document).on('click', '.link', function(event){
         event.preventDefault();
         let link = (rPA[num].pl_pelink); 
         window.open(
@@ -329,7 +337,7 @@ function listenForLinkClick(rPA, num) {
 }
 
 function listenToStarInfo(rPA, num) {
-    $(document).on("click", ".hostStar", function(event) {
+    $(document).on('click', '.hostStar', function(event) {
         event.preventDefault();
         let alpha = $(this).prop('class');
         let beta = '#' +  alpha + '-hide';
