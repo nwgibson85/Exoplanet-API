@@ -1,6 +1,6 @@
 'use strict';
 
-//Get request variables
+//Set request variables
 const apiKey = 'Bsa2YtF9x3coxqZqsYgqI4iAzpAsMgfhoRdKh0w4'; 
 const baseURL = 'https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI';
 let time = '';
@@ -256,6 +256,7 @@ function fetchRandomExoPlanet() {
     fetch(url)
       .then(response => {
         if (response.ok) {
+            console.log(response.json())
           return response.json();
         }
         throw new Error(response.statusText);
@@ -266,7 +267,7 @@ function fetchRandomExoPlanet() {
       });   
 }
 
-// narrow down responseJSon to most useful planets 4k down to ~ 110
+// narrow down responseJSon to planets containing the used data, (originally 4k) now 5k+ down to ~ 110
 function sortJson(responseJson) { 
     let uselessJson = [];
     let arr = [];
